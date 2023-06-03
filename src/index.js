@@ -1,6 +1,7 @@
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import axios from 'axios';
 
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
@@ -19,7 +20,7 @@ toggleLoadMoreButton(false);
 
 async function handleSubmit(event) {
   event.preventDefault();
-  const searchQuery = event.target.elements.searchQuery.value;
+  const searchQuery = event.target.elements.searchQuery.value.trim();
   if (searchQuery === '') return;
 
   clearGallery();
@@ -32,20 +33,20 @@ async function handleSubmit(event) {
 }
 
 async function handleLoadMore() {
-  const searchQuery = searchForm.elements.searchQuery.value;
-  await searchImages(searchQuery);
+  const searchQuery = searchForm.elements.searchQuery.value.trim();
   if (searchQuery === '') return;
+  await searchImages(searchQuery);
 }
 
+
 async function searchImages(query) {
+  const encodedQuery = encodeURIComponent(query);
   const apiKey = '36817404-47f661a18c4ba676724276e01';
-  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-    query
-  )}&image_type=photo&orientation=horizontal&safesearch=true&page=${currentPage}&per_page=${imagesPerPage}`;
+  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodedQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${currentPage}&per_page=${imagesPerPage}`;
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    const response = await axios.get(url);
+    const data = response.data;
 
     if (data.hits.length === 0) {
       if (currentPage === 1) {
