@@ -5,15 +5,40 @@ import axios from 'axios';
 
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
-const loadMoreButton = document.querySelector('.load-more');
 let currentPage = 1;
 const imagesPerPage = 40;
 let lightbox;
 let endOfResultsShown = false;
 let successMessageShown = false;
 
+function toggleLoadMoreButton(show) {
+  const loadMoreButton = document.querySelector('.load-more');
+  loadMoreButton.style.display = show ? 'block' : 'none';
+}
+
+function resetPagination() {
+  currentPage = 1;
+}
+
+function createInfoItem(label, value) {
+  const item = document.createElement('div');
+  item.classList.add('info-item');
+
+  const itemLabel = document.createElement('span');
+  itemLabel.classList.add('info-label');
+  itemLabel.textContent = label;
+
+  const itemValue = document.createElement('span');
+  itemValue.classList.add('info-value');
+  itemValue.textContent = value;
+
+  item.appendChild(itemLabel);
+  item.appendChild(itemValue);
+
+  return item;
+}
+
 searchForm.addEventListener('submit', handleSubmit);
-loadMoreButton.addEventListener('click', handleLoadMore);
 window.addEventListener('scroll', handleScroll);
 
 toggleLoadMoreButton(false);
@@ -29,20 +54,30 @@ async function handleSubmit(event) {
   endOfResultsShown = false;
   await searchImages(searchQuery);
   toggleLoadMoreButton(false);
-  window.addEventListener('scroll', handleScroll);
 }
 
-async function handleLoadMore() {
-  const searchQuery = searchForm.elements.searchQuery.value.trim();
-  if (searchQuery === '') return;
+function handleScroll() {
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const documentHeight = document.documentElement.offsetHeight;
+
+  if (scrollPosition >= documentHeight - 1000) {
+    const searchQuery = searchForm.elements.searchQuery.value.trim();
+    handleLoadMore(searchQuery);
+  }
+}
+
+async function handleLoadMore(searchQuery) {
+  if (endOfResultsShown) {
+    return;
+  }
   await searchImages(searchQuery);
 }
 
-
 async function searchImages(query) {
-  const encodedQuery = encodeURIComponent(query);
   const apiKey = '36817404-47f661a18c4ba676724276e01';
-  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodedQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${currentPage}&per_page=${imagesPerPage}`;
+  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
+    query
+  )}&image_type=photo&orientation=horizontal&safesearch=true&page=${currentPage}&per_page=${imagesPerPage}`;
 
   try {
     const response = await axios.get(url);
@@ -99,16 +134,10 @@ function smoothScrollToNextGroup() {
 
 function clearGallery() {
   gallery.innerHTML = '';
-}
-
-function renderImages(images) {
-  images.forEach(image => {
-    const photoCard = createPhotoCard(image);
-    if (photoCard) {
-      gallery.appendChild(photoCard);
-    }
-  });
-  refreshLightbox();
+  if (lightbox) {
+    lightbox.close();
+    lightbox = null;
+  }
 }
 
 function createPhotoCard(image) {
@@ -150,40 +179,24 @@ function createPhotoCard(image) {
   return photoCard;
 }
 
-function createInfoItem(label, value) {
-  const item = document.createElement('div');
-  item.classList.add('info-item');
+const renderedImages = {};
 
-  const itemLabel = document.createElement('span');
-  itemLabel.classList.add('label');
-  itemLabel.textContent = label;
+function renderImages(images) {
+  const fragment = document.createDocumentFragment();
 
-  const itemValue = document.createElement('span');
-  itemValue.classList.add('value');
-  itemValue.textContent = value;
+  images.forEach(image => {
+    if (!renderedImages[image.webformatURL]) {
+      const photoCard = createPhotoCard(image);
+      if (photoCard) {
+        fragment.appendChild(photoCard);
+        renderedImages[image.webformatURL] = true;
+      }
+    }
+  });
 
-  item.appendChild(itemLabel);
-  item.appendChild(itemValue);
-
-  return item;
-}
-
-function resetPagination() {
-  currentPage = 1;
-}
-
-function toggleLoadMoreButton(show) {
-  loadMoreButton.style.display = show ? 'block' : 'none';
-}
-
-function handleScroll(event) {
-  const scrollPosition = window.innerHeight + window.scrollY;
-  const documentHeight = document.documentElement.offsetHeight;
-
-  if (scrollPosition >= documentHeight - 1000) {
-    const searchQuery = searchForm.elements.searchQuery.value;
-    handleLoadMore(searchQuery);
-  }
+  gallery.appendChild(fragment);
+  refreshLightbox();
+  toggleLoadMoreButton(images.length === imagesPerPage);
 }
 
 function refreshLightbox() {

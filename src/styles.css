@@ -55,12 +55,12 @@ a {
   align-items: center;
 }
 
-.label {
+.info-label {
   text-decoration: none;
   color: #000;
 }
 
-.value {
+.info-value {
   text-decoration: none;
   color: #000;
   font-size: 14px;
