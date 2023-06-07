@@ -12,14 +12,40 @@
 
 <body>
   <form class="search-form" id="search-form">
-    <input type="text" name="searchQuery" autocomplete="off" placeholder="Search images..." />
+    <input type="text" id="search-input" name="searchQuery" autocomplete="off" placeholder="Search images..." />
     <button type="submit" class="search-btn">Search</button>
-  </form>
-  <div class="gallery">
+    </form>
+    <div class="gallery">
     <!---gallery-images--->
   </div>
   <button type="button" class="load-more">Load more</button>
-</body>
+  <button id="back-to-top-btn" class="back-to-top-btn hidden" title="Back to Top">
+    <i>&#8593</i>
+  </button>
+  
+  <script>
+    const backToTopBtn = document.getElementById('back-to-top-btn');
 
+    backToTopBtn.addEventListener('click', scrollToTop);
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+    function handleScroll() {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.classList.remove('hidden');
+      } else {
+        backToTopBtn.classList.add('hidden');
+      }
+    }
+  </script>
+  
+</body>
 </html>
 

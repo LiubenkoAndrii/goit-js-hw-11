@@ -1,13 +1,20 @@
 .search-form {
+  /* background-color: rgb(128, 128, 128, 0.8); */
+  padding-top: 50px;
+  padding-bottom: 50px;
   display: flex;
   gap: 20px;
   justify-content: center;
-  margin-top: 50px;
   margin-bottom: 50px;
+}
+
+input {
+  padding: 5px;
 }
 
 .search-btn {
   border-radius: 5px;
+  padding: 5px;
 }
 
 .search-btn:hover {
@@ -26,6 +33,7 @@
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 10px;
+  text-decoration: none;
   transition: transform 0.2s ease;
 }
 
@@ -39,10 +47,6 @@
   max-height: 150px;
 }
 
-a {
-  text-decoration: none;
-}
-
 .info {
   display: flex;
   gap: 15px;
@@ -53,16 +57,45 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-decoration: none;
 }
 
-.info-label {
-  text-decoration: none;
+b {
   color: #000;
+  font-size: 14px;
+  font-weight: 400;
 }
 
-.info-value {
-  text-decoration: none;
+p.info-item {
   color: #000;
   font-size: 14px;
   font-weight: 100;
+}
+
+.back-to-top-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: rgb(128, 128, 128, 0.8);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.back-to-top-btn i {
+  font-size: 24px;
+  line-height: 40px;
+}
+
+.back-to-top-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.back-to-top-btn:hover {
+  background-color: #555;
 }
